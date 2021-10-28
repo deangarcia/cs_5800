@@ -1,0 +1,125 @@
+CREATE TABLE public.Instrument (
+                Name VARCHAR(40) NOT NULL,
+                Pitch VARCHAR(400) NOT NULL,
+                CONSTRAINT name_fk PRIMARY KEY (Name)
+);
+CREATE TABLE public.Address (
+                AddressID INTEGER NOT NULL,
+                number INTEGER NOT NULL,
+                Street1 VARCHAR(40) NOT NULL,
+                Street2 VARCHAR(40) NOT NULL,
+                City VARCHAR(40) NOT NULL,
+                State VARCHAR(40) NOT NULL,
+                Zipcode VARCHAR(40) NOT NULL,
+                Phone VARCHAR(40) NOT NULL,
+                CONSTRAINT addressid PRIMARY KEY (AddressID)
+);
+CREATE TABLE public.Musician (
+                SSN VARCHAR(11) NOT NULL,
+                Name VARCHAR(40) NOT NULL,
+                AddressID INTEGER NOT NULL,
+                CONSTRAINT ssn_pk PRIMARY KEY (SSN)
+);
+CREATE TABLE public.Plays (
+                SSN_Musician VARCHAR(11) NOT NULL,
+                Name VARCHAR(40) NOT NULL,
+                CONSTRAINT ssn_plays PRIMARY KEY (SSN_Musician, Name)
+);
+COMMENT ON TABLE public.Plays IS 'Joint Table';
+CREATE TABLE public.Album (
+                AlbumID INTEGER NOT NULL,
+                Title VARCHAR(40) NOT NULL,
+                Release_Date DATE NOT NULL,
+                Format VARCHAR(400) NOT NULL,
+                Age INTEGER NOT NULL,
+                SSN_Produced_By VARCHAR(11) NOT NULL,
+                CONSTRAINT albumid PRIMARY KEY (AlbumID)
+);
+CREATE TABLE public.Song (
+                Title VARCHAR(400) NOT NULL,
+                Length TIME NOT NULL,
+                AlbumID INTEGER NOT NULL,
+                SSN_Authored VARCHAR(11) NOT NULL,
+                CONSTRAINT title PRIMARY KEY (Title)
+);
+CREATE TABLE public.Used_In (
+                Name_Instrument VARCHAR(40) NOT NULL,
+                Title_Song VARCHAR(400) NOT NULL,
+                CONSTRAINT name_instrument PRIMARY KEY (Name_Instrument, Title_Song)
+);
+CREATE TABLE public.Performs (
+                Title VARCHAR(400) NOT NULL,
+                SSN_Performer VARCHAR(11) NOT NULL,
+                CONSTRAINT ssn_performer PRIMARY KEY (Title)
+);
+COMMENT ON TABLE public.Performs IS 'Joint Table';
+
+ALTER TABLE public.Plays ADD CONSTRAINT instrument_plays_fk
+FOREIGN KEY (Name)
+REFERENCES public.Instrument (Name)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
+
+ALTER TABLE public.Used_In ADD CONSTRAINT instrument_used_in_fk
+FOREIGN KEY (Name_Instrument)
+REFERENCES public.Instrument (Name)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
+
+ALTER TABLE public.Musician ADD CONSTRAINT address_musician_fk
+FOREIGN KEY (AddressID)
+REFERENCES public.Address (AddressID)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
+
+ALTER TABLE public.Album ADD CONSTRAINT musician_album_fk
+FOREIGN KEY (SSN_Produced_By)
+REFERENCES public.Musician (SSN)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
+
+ALTER TABLE public.Song ADD CONSTRAINT musician_song_fk
+FOREIGN KEY (SSN_Authored)
+REFERENCES public.Musician (SSN)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
+
+ALTER TABLE public.Performs ADD CONSTRAINT musician_performs_fk
+FOREIGN KEY (SSN_Performer)
+REFERENCES public.Musician (SSN)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
+
+ALTER TABLE public.Plays ADD CONSTRAINT musician_plays_fk
+FOREIGN KEY (SSN_Musician)
+REFERENCES public.Musician (SSN)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
+
+ALTER TABLE public.Song ADD CONSTRAINT album_song_fk
+FOREIGN KEY (AlbumID)
+REFERENCES public.Album (AlbumID)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
+
+ALTER TABLE public.Performs ADD CONSTRAINT song_performs_fk
+FOREIGN KEY (Title)
+REFERENCES public.Song (Title)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
+
+ALTER TABLE public.Used_In ADD CONSTRAINT song_used_in_fk
+FOREIGN KEY (Title_Song)
+REFERENCES public.Song (Title)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
